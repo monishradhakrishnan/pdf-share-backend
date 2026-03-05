@@ -10,11 +10,17 @@ const { GridFSBucket, ObjectId } = require("mongodb");
 
 const app = express();
 app.use(express.json());
+
+// ─── CORS ─────────────────────────────────────────────────────
 app.use(cors({
   origin: "*",
-  methods: ["GET", "POST", "DELETE", "PUT"],
+  methods: ["GET", "POST", "DELETE", "PUT", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
+  preflightContinue: false,
+  optionsSuccessStatus: 204,
 }));
+app.options("*", cors()); // handle preflight for all routes
+
 app.use(morgan("dev"));
 
 const MONGO_URI = process.env.MONGO_URI;
