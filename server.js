@@ -334,9 +334,10 @@ app.post("/api/pdfs/:id/share", auth, async (req, res) => {
 app.get("/api/health", (req, res) => res.json({ status: "ok" }));
 
 // ─── Keep Alive (for Render free tier) ───────────────────────
+const http = require("http");
 const BACKEND_URL = process.env.BACKEND_URL || `http://localhost:${PORT}`;
 setInterval(() => {
-  fetch(`${BACKEND_URL}/api/health`).catch(() => {});
+  http.get(`${BACKEND_URL}/api/health`, () => {}).on("error", () => {});
 }, 14 * 60 * 1000);
 
 // ─── Start Server ─────────────────────────────────────────────
