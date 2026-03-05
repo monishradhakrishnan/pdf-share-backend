@@ -17,9 +17,17 @@ app.use(cors({
 }));
 app.use(morgan("dev"));
 
-const MONGO_URI = process.env.MONGO_URI || "mongodb://localhost:27017/chatappdb";
+const MONGO_URI = process.env.MONGO_URI;
 const JWT_SECRET = process.env.JWT_SECRET || "supersecretkey";
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 10000;
+
+console.log("MONGO_URI:", MONGO_URI ? "found ✅" : "MISSING ❌");
+console.log("PORT:", PORT);
+
+if (!MONGO_URI) {
+  console.error("ERROR: MONGO_URI environment variable is not set!");
+  process.exit(1);
+}
 
 // ─── DB Connection ────────────────────────────────────────────
 let bucket;
