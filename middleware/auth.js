@@ -18,4 +18,17 @@ const adminAuth = (req, res, next) => {
   next();
 };
 
-module.exports = { auth, adminAuth };
+// Always verify role from DB so stale JWT tokens don't block access
+const User = require("../models/User");
+const printAdminAuth = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.user.id).select("role");
+    if (!user || user.role !== "print_admin")
+      return res.status(403).json({ error: "Print admins only." });
+    next();
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+module.exports = { auth, adminAuth, printAdminAuth };
