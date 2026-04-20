@@ -52,22 +52,24 @@ const getNextOrderId = async () => {
   return `PRI-${String(counter.seq).padStart(4, "0")}`;
 };
 
-// GET /api/print/shops
-router.get("/shops", auth, async (req, res) => {
+// GET /api/print/shops  — returns all print admins as "shops"
+router.get("/shops", auth, async (req, res) => {       // ✅ was: authenticate
   try {
-    const shops = await User.find({ role: "print_admin" }).select("name email");
-    const shopsWithCount = await Promise.all(
+    const shops = await User.find({ role: "print_admin" }).select("_id name email"); // ✅ was: "printAdmin"
+
+    const shopsWithQueue = await Promise.all(
       shops.map(async (shop) => {
         const queueCount = await PrintRequest.countDocuments({
           printAdmin: shop._id,
           status: "pending",
         });
-        return { _id: shop._id, name: shop.name, email: shop.email, queueCount };
+        return { ...shop.toObject(), queueCount };
       })
     );
-    res.json(shopsWithCount);
+
+    res.json(shopsWithQueue);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ error: "Could not fetch print shops" });
   }
 });
 
